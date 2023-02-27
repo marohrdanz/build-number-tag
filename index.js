@@ -65,8 +65,10 @@ function requestGitHubAPI(method, path, data, callback) {
 function main() {
     const prefix = `${env.INPUT_PREFIX}`; // default specified in action.yml
     /* 
-      GET tags with specified prefix, and from response determine next tag name.
-      Then POST a new tag with appropriate name
+      GET tags with specified prefix, based on the response:
+       - determine new tag hame (with updated build number)
+       - POST new tag
+       - output new build number (in case later steps want it)
     */
     requestGitHubAPI('GET', `/repos/${env.GITHUB_REPOSITORY}/git/refs/tags/${prefix}`, null, (err, status, result) => {
        if (status === 404) {
@@ -93,12 +95,18 @@ function main() {
             ref:`refs/tags/${prefix}${nextBuildNumber}`, 
             sha: env.GITHUB_SHA
         };
+        /*
+           POST new tag to repository
+        */
         requestGitHubAPI('POST', `/repos/${env.GITHUB_REPOSITORY}/git/refs`, newTagData, (err, status, result) => {
             if (status !== 201 || err) {
                 fail(`Failed to create new ${prefix} tag. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
             }
-            console.log(`Successfully updated build number to ${nextBuildNumber}`);
-            //Setting the output and a environment variable to new build number in case later steps want it
+            console.log(`Successfully created new tag: ${prefix}${nextBuildNumber}`);
+            /*
+              Output the new build number to GitHub output and environment variables in case the user's 
+              subsequent steps want to make use of it
+            */
             fs.writeFileSync(process.env.GITHUB_OUTPUT, `build_number=${nextBuildNumber}`);
             fs.writeFileSync(process.env.GITHUB_ENV, `BUILD_NUMBER=${nextBuildNumber}`);
          });
