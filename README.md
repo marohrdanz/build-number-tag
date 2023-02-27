@@ -14,7 +14,7 @@ This action creates a tag with the build number in the repo.
 ## Example usage
 
 ```yaml
-uses: actions/hello-world-javascript-action@v1.1
+uses: actions/build-number-tag@main
 with:
   token: ${{ secrets.TOKEN }}
   prefix: 'my-build-number-'
