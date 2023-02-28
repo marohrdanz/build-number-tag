@@ -61,22 +61,27 @@ function getTagsMatchingPrefix(tags) {
 
 // Determines new build number based on tags and ${prefix} global variable
 function getBuildNumber(tags) {
-  let build_number;
-  if (tags.length < 1) {
-    core.info(`No tags matching prefix '${prefix}'. Setting build number to 1.`);
-    build_number = 1;
+  try {
+    let build_number;
+    if (tags.length < 1) {
+      core.info(`No tags matching prefix '${prefix}'. Setting build number to 1.`);
+      build_number = 1;
+      return build_number;
+    }
+    core.debug("Trying to get existing tags")
+    let tagsString = JSON.stringify(tags, undefined, 2);
+    core.debug(tagsString);
+    let existingBuildNumbers = tags.map(t => parseInt(t.name.match(/-(\d+)$/)[1]));
+    core.debug("Existing build numbers: ", JSON.stringify(existingBuildNumbers, undefined, 2));
+    let currentBuildNumber = Math.max(...existingBuildNumbers);
+    core.debug(`Largest '${prefix}' tag is ${currentBuildNumber}.`);
+    build_number = currentBuildNumber + 1;
+    core.info(`Build number: ${build_number}.`);
     return build_number;
+  } catch (err) {
+    core.error(err)
+    throw "Error getting build number";
   }
-  core.debug("Trying to get existing tags")
-  let tagsString = JSON.stringify(tags, undefined, 2);
-  core.debug(tagsString);
-  let existingBuildNumbers = tags.map(t => parseInt(t.name.match(/(\d+)$/)[1]));
-  core.debug("Existing build numbers: ", JSON.stringify(existingBuildNumbers, undefined, 2));
-  let currentBuildNumber = Math.max(...existingBuildNumbers);
-  core.debug(`Largest '${prefix}' tag is ${currentBuildNumber}.`);
-  build_number = currentBuildNumber + 1;
-  core.info(`Build number: ${build_number}.`);
-  return build_number;
 }
 
 // Creates new tag in the repo
