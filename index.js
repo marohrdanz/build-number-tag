@@ -70,12 +70,11 @@ async function getTags() {
         owner: repo_owner,
         repo: repo_name
     };
+    core.debug(`Options for getTags: ${options}`);
     core.debug(JSON.stringify(options, null, 4));
     const response = await octokit.rest.repos.listTags(options);
     console.log(response);
     allTags = response.data;
-    core.debug("Tags in getTags ")
-    core.debug(JSON.stringify(allTags, undefined, 2));
     return(allTags);
 }
 
@@ -87,19 +86,24 @@ async function main() {
       //const payload = JSON.stringify(github.context.payload, undefined, 2)
       //core.debug(`The event payload: ${payload}`);
       let allTags = await getTags();
-      core.debug("Tags in main: ");
-      core.debug(JSON.stringify(allTags, undefined, 2));
+      //core.debug("Tags in main: ");
+      //core.debug(JSON.stringify(allTags, undefined, 2));
       const regexString = `${prefix}(\\d+)$`;
       const regex = new RegExp(regexString);
       let tagsMatchingPrefix = allTags.filter(t => t.name.match(regex));
-      core.debug("Tags matching prefix: ");
-      core.debug(JSON.stringify(tagsMatchingPrefix, undefined, 2));
-      let existingBuildNumbers = tagsMatchingPrefix.map(t => parseInt(t.name.match(/-(\d+)$/)[1]));
-      core.debug("Existing build numbers: ", JSON.stringify(existingBuildNumbers, undefined, 2));
-      let currentBuildNumber = Math.max(...existingBuildNumbers);
-      core.info(`Largest '${prefix}' tag is ${currentBuildNumber}.`);
-      let nextBuildNumber = currentBuildNumber + 1;
-      core.info(`Updating '${prefix}' counter to ${nextBuildNumber}.`);
+      let build_number;
+      if (tagsMatchingPrefix.length < 1) {
+        build_number = 0;
+      } else {
+        //core.debug("Tags matching prefix: ");
+        //core.debug(JSON.stringify(tagsMatchingPrefix, undefined, 2));
+        let existingBuildNumbers = tagsMatchingPrefix.map(t => parseInt(t.name.match(/-(\d+)$/)[1]));
+        core.debug("Existing build numbers: ", JSON.stringify(existingBuildNumbers, undefined, 2));
+        let currentBuildNumber = Math.max(...existingBuildNumbers);
+        core.info(`Largest '${prefix}' tag is ${currentBuildNumber}.`);
+        build_number = currentBuildNumber + 1;
+        core.info(`Updating '${prefix}' counter to ${build_number}.`);
+      }
     } catch(err) {
       core.error(err);
       core.setFailed(err);
