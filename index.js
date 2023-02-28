@@ -72,7 +72,6 @@ function main() {
        - output new build number (in case later steps want it)
     */
     requestGitHubAPI('GET', `/repos/${env.GITHUB_REPOSITORY}/git/refs/tags/${prefix}`, null, (err, status, result) => {
-       core.error("How does this appear?")
        if (status === 404) {
             core.info(`No ${prefix} ref available, starting at 1.`);
             nextBuildNumber = 1;
@@ -87,10 +86,8 @@ function main() {
             core.info(`Updating '${prefix}' counter to ${nextBuildNumber}.`);
         } else {
             if (err) {
-                core.error(`Failed to get refs. Error: ${err}, status: ${status}`);
                 core.setFailed(`Failed to get refs. Error: ${err}, status: ${status}`);
             } else {
-                core.error(`Getting build-number refs failed with http status ${status}, error: ${JSON.stringify(result)}`);
                 core.setFailed(`Getting build-number refs failed with http status ${status}, error: ${JSON.stringify(result)}`);
             } 
        }
@@ -104,10 +101,9 @@ function main() {
         */
         requestGitHubAPI('POST', `/repos/${env.GITHUB_REPOSITORY}/git/refs`, newTagData, (err, status, result) => {
             if (status !== 201 || err) {
-                core.error(`Failed to create new ${prefix} tag. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
                 core.setFailed(`Failed to create new ${prefix} tag. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
             }
-            core.notice(`Created new tag: ${prefix}${nextBuildNumber}`);
+            core.notice(`Successfully created new tag '${prefix}${nextBuildNumber}'`);
             core.setOutput("build_number", nextBuildNumber);
          });
     });
