@@ -87,8 +87,10 @@ function main() {
       const payload = JSON.stringify(github.context.payload, undefined, 2)
       console.log(`The event payload: ${payload}`);
       //core.debug(`Repo name: ", ${payload.repository.name}`);
-      const repo_name = github.context.payload.repository.owner.name;
+      const repo_name = github.context.payload.repository.name;
       core.debug(`Repo name: ${repo_name}`);
+      core.debug("Repo owner: ", github.context.payload.repository.owner.name);
+
       //core.debug(`GITHUB_REPOSITORY_OWNER: ${GITHUB_REPOSITORY_OWNER}`);
     } catch(err) {
       core.error(err);
