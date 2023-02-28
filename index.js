@@ -5,7 +5,6 @@ const myToken = core.getInput('token');
 const octokit = github.getOctokit(myToken);
 const repo_name = github.context.payload.repository.name;
 const repo_owner = github.context.payload.repository.owner.name;
-const sha = github.context.payload.after;
 const payload = JSON.stringify(github.context.payload, undefined, 2)
 console.log(`The event payload: ${payload}`);
 
@@ -46,18 +45,13 @@ function getBuildNumber(tags, prefix) {
   return (build_number);
 }
 
-async function createTag(tagName) {
-  core.debug(`Creating tag: ${tagName}`);
+function createTag(tagName) {
   const options = {
     owner: repo_owner,
     repo: repo_name,
     ref: tagName,
-    sha: sha
+    sha: "zeta"
   }
-  const response = await octokit.rest.git.createRef(options);
-  core.debug("After creating tag?")
-  core.debug(response)
-  return(response)
 }
 
 async function main() {
@@ -67,9 +61,6 @@ async function main() {
       let build_number = getBuildNumber(tagsMatchingPrefix, core.getInput('prefix'));
       core.info(`New build number for tag: ${build_number}.`);
       core.setOutput("build_number", build_number);
-      let tagName = `${prefix}${build_number}`;
-      response = await createTag(tagName)
-      core.debug("after creating tag")
     } catch(err) {
       core.error(err);
       core.setFailed(err);
