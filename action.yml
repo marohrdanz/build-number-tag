@@ -7,7 +7,7 @@ inputs:
     default: 'build-number-'
   token:
     description: 'GitHub token to create and delete refs'
-    required: false # only needed for very first job
+    required: true
 outputs:
   build_number:
     description: 'Build tag number'
