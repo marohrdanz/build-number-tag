@@ -82,8 +82,18 @@ async function main() {
     const prefix = core.getInput('prefix');
     core.debug(`Tag prefix: ${prefix}`);
     try {
+      core.debug("GITHUB_BASE_REF:", process.env.GITHUB_BASE_REF);
+      core.debug("GITHUB_REPOSITORY:", process.env.GITHUB_REPOSITORY);
+      core.debug("Repo name: ", github.context.payload.repository.name);
+      core.debug("Repo owner: ", github.context.payload.repository.owner.name);
       const payload = JSON.stringify(github.context.payload, undefined, 2)
-      core.debug(`The event payload: ${payload}`);
+      console.log(`The event payload: ${payload}`);
+      //core.debug(`Repo name: ", ${payload.repository.name}`);
+      const repo_name = github.context.payload.repository.name;
+      core.debug(`Repo name: ${repo_name}`);
+      core.debug("Repo owner: ", github.context.payload.repository.owner.name);
+
+      //core.debug(`GITHUB_REPOSITORY_OWNER: ${GITHUB_REPOSITORY_OWNER}`);
     } catch(err) {
       core.error(err);
       core.setFailed(err);
@@ -91,24 +101,14 @@ async function main() {
     let allTags = await getTags();
     core.debug("Tags: ")
     core.debug(allTags);
-    const regexString = `/${prefix}(\\d+)$`;
-    const regex = new RegExp(regexString);
-    let tagsMatchingPrefix = allTags.filter(t => t.name.match(regex));
-    let existingBuildNumbers = tagsMatchingPrefix.map(t => parseInt(t.ref.match(/-(\d+)$/)[1]));
-    let currentBuildNumber = Math.max(...existingBuildNumbers);
-    core.info(`Largest '${prefix}' tag is ${currentBuildNumber}.`);
-    let nextBuildNumber = currentBuildNumber + 1;
-    core.info(`Updating '${prefix}' counter to ${nextBuildNumber}.`);
-
-
-    //let nextBuildNumber;
+    let nextBuildNumber;
     /* 
       GET tags with specified prefix, based on the response:
        - determine new tag hame (with updated build number)
        - POST new tag
        - output new build number (in case later steps want it)
     */
-    /*requestGitHubAPI('GET', `/repos/${env.GITHUB_REPOSITORY}/git/refs/tags/${prefix}`, null, (err, status, result) => {
+    requestGitHubAPI('GET', `/repos/${env.GITHUB_REPOSITORY}/git/refs/tags/${prefix}`, null, (err, status, result) => {
        if (status === 404) {
             core.info(`No ${prefix} ref available, starting at 1.`);
             nextBuildNumber = 1;
@@ -135,6 +135,9 @@ async function main() {
             sha: env.GITHUB_SHA
         };
         core.debug(`Making new tag: ${prefix}${nextBuildNumber}`);
+        /*
+           POST new tag to repository
+        */
         requestGitHubAPI('POST', `/repos/${env.GITHUB_REPOSITORY}/git/refs`, newTagData, (err, status, result) => {
             if (status !== 201 || err) {
                 core.error(`Failed to create new ${prefix} tag. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
@@ -143,7 +146,7 @@ async function main() {
             core.notice(`Created new tag: ${prefix}${nextBuildNumber}`);
             core.setOutput("build_number", nextBuildNumber);
          });
-    });*/
+    });
 
 }
 
