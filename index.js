@@ -12,15 +12,30 @@ console.log(`The event payload: ${payload}`);
 
 main();
 
+async function main() {
+  try {
+    let allTags = await getAllTags();
+    let tagsMatchingPrefix = getTagsMatchingPrefix(allTags)
+    let build_number = getBuildNumber(tagsMatchingPrefix)
+    let tagName = `${prefix}${build_number}`;
+    response = await createTag(tagName)
+    core.debug("after creating tag")
+    core.info(`New build number for tag: ${build_number}.`);
+    core.setOutput("build_number", build_number);
+  } catch(err) {
+    core.error(err);
+    core.setFailed(err);
+  }
+}
+
 async function getAllTags() {
   const options =  {
     owner: repo_owner,
     repo: repo_name
   };
-  core.debug(`Options for getAllTags: ${options}`);
+  core.debug("Options for getAllTags:");
   core.debug(JSON.stringify(options, null, 4));
   const response = await octokit.rest.repos.listTags(options);
-  core.debug(response);
   allTags = response.data;
   return(allTags);
 }
@@ -35,7 +50,7 @@ function getTagsMatchingPrefix(tags ) {
 function getBuildNumber(tags) {
   let build_number;
   if (tags.length < 1) {
-    core.info(`No tags matching ${prefix}. Setting build_number to 1.`);
+    core.info(`No tags matching prefix '${prefix}'. Setting build_number to 1.`);
     build_number = 1;
     return (build_number);
   }
@@ -44,6 +59,7 @@ function getBuildNumber(tags) {
   let currentBuildNumber = Math.max(...existingBuildNumbers);
   core.info(`Largest '${prefix}' tag is ${currentBuildNumber}.`);
   build_number = currentBuildNumber + 1;
+  core.info(`Setting build_number to ${build_number}.`);
   return (build_number);
 }
 
@@ -55,29 +71,15 @@ async function createTag(tagName) {
     ref: tagName,
     sha: sha
   }
+  core.debug("Options for createTag:");
+  core.debug(JSON.stringify(options, null, 4));
   const response = await octokit.rest.git.createRef(options);
   core.debug("After creating tag?")
   core.debug(response)
   return(response)
 }
 
-async function main() {
-    try {
-      let allTags = await getAllTags();
-      let tagsMatchingPrefix = getTagsMatchingPrefix(allTags)
-      let build_number = getBuildNumber(tagsMatchingPrefix)
-      core.info(`New build number for tag: ${build_number}.`);
-      core.setOutput("build_number", build_number);
-      let tagName = `${prefix}${build_number}`;
-      response = await createTag(tagName)
-      core.debug("after creating tag")
-    } catch(err) {
-      core.error(err);
-      core.setFailed(err);
-    }
 
-
-}
 
 
 
