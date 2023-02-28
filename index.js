@@ -41,11 +41,11 @@ async function getAllTags() {
     core.debug(JSON.stringify(options, null, 4));
     const response = await octokit.rest.repos.listTags(options);
     core.debug("Have response from getting tags")
-    console.log(response);
-    allTags = response.data;
+    let allTags = response.data;
     return allTags;
   } catch (err) {
-    return err;
+    core.error(err);
+    throw "Error getting tags";
   }
 }
 
@@ -54,6 +54,8 @@ function getTagsMatchingPrefix(tags) {
   const regexString = `${prefix}(\\d+)$`;
   const regex = new RegExp(regexString);
   let tagsMatchingPrefix = tags.filter(t => t.name.match(regex));
+  core.debug("Have matching tags:")
+  core.debug(JSON.stringify((tagsMatchingPrefix, undefined, 2)))
   return tagsMatchingPrefix;
 }
 
