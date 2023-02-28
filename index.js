@@ -95,11 +95,9 @@ function main() {
             console.log(`Updating ${prefix} counter to ${nextBuildNumber}...`);
         } else {
             if (err) {
-                //failWithError(`Failed to get refs. Error: ${err}, status: ${status}`);
-                core.setFailed(`Failed to get refs. Error: ${err}, status: ${status}`);
+                failWithError(`Failed to get refs. Error: ${err}, status: ${status}`);
             } else {
-                //failWithError(`Getting build-number refs failed with http status ${status}, error: ${JSON.stringify(result)}`);
-                core.setFailed(`Getting build-number refs failed with http status ${status}, error: ${JSON.stringify(result)}`);
+                failWithError(`Getting build-number refs failed with http status ${status}, error: ${JSON.stringify(result)}`);
             } 
        }
        let newTagData = {
@@ -110,10 +108,8 @@ function main() {
            POST new tag to repository
         */
         requestGitHubAPI('POST', `/repos/${env.GITHUB_REPOSITORY}/git/refs`, newTagData, (err, status, result) => {
-            err = "fail on purpose";
             if (status !== 201 || err) {
                 failWithError(`Failed to create new ${prefix} tag. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
-                core.setFailed(`Failed to create new ${prefix} tag. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
             }
             console.log(`Successfully created new tag: ${prefix}${nextBuildNumber}`);
             /*
