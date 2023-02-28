@@ -71,12 +71,11 @@ async function getTags() {
         repo: repo_name
     };
     core.debug(JSON.stringify(options, null, 4));
-    const response = await octokit.rest.repos.listTags(options);
+    const listTags = await octokit.rest.repos.listTags(options);
     console.log(listTags);
-    allTags = response.data;
     core.debug("Tags in getTags ")
-    core.debug(JSON.stringify(allTags, undefined, 2));
-    return(allTags);
+    core.debug(JSON.stringify(listTags, undefined, 2));
+    return(listTags);
 }
 
 async function main() {
