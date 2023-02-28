@@ -81,9 +81,9 @@ function main() {
             let tagsMatchingPrefix = result.filter(d => d.ref.match(regex));
             let existingBuildNumbers = tagsMatchingPrefix.map(t => parseInt(t.ref.match(/-(\d+)$/)[1]));
             let currentBuildNumber = Math.max(...existingBuildNumbers);
-            core.info(`Largest ${prefix} number is ${currentBuildNumber}.`);
+            core.info(`Largest '${prefix}' tag is ${currentBuildNumber}.`);
             nextBuildNumber = currentBuildNumber + 1;
-            core.info(`Updating ${prefix} counter to ${nextBuildNumber}...`);
+            core.info(`Updating '${prefix}' counter to ${nextBuildNumber}.`);
         } else {
             if (err) {
                 core.setFailed(`Failed to get refs. Error: ${err}, status: ${status}`);
@@ -103,7 +103,7 @@ function main() {
             if (status !== 201 || err) {
                 core.setFailed(`Failed to create new ${prefix} tag. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
             }
-            core.info(`Successfully created new tag: ${prefix}${nextBuildNumber}`);
+            core.notice(`Successfully created new tag '${prefix}${nextBuildNumber}'`);
             core.setOutput("build_number", nextBuildNumber);
          });
     });
