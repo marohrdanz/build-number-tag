@@ -91,7 +91,10 @@ async function main() {
       core.debug(JSON.stringify(allTags, undefined, 2));
       const regexString = `/${prefix}(\\d+)$`;
       const regex = new RegExp(regexString);
-      let tagsMatchingPrefix = allTags.filter(t => t.name.match(regex));
+      let tagsMatchingPrefix = allTags.filter(t => {
+        core.debug(t);
+        t.name.match(regex)
+      });
       core.debug("Tags matching prefix: ");
       core.debug(JSON.stringify(tagsMatchingPrefix, undefined, 2));
       let existingBuildNumbers = tagsMatchingPrefix.map(t => parseInt(t.name.match(/-(\d+)$/)[1]));
