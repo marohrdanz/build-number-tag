@@ -14,6 +14,8 @@ core.debug(`sha: ${sha}`);
 core.debug(`Tag prefix: ${prefix}`);
 const payload = JSON.stringify(github.context.payload, undefined, 2)
 core.debug(`The event payload: ${payload}`);
+const whole_gitHub = JSON.stringify(github, undefined, 2);
+core.debug(`the whole github: ${whole_gitHub}`);
 
 main();
 
