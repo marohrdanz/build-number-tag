@@ -68,6 +68,8 @@ function getBuildNumber(tags) {
     return build_number;
   }
   core.debug("Trying to get existing tags")
+  let tagsString = JSON.stringify(tags, undefined, 2);
+  core.debug(tagsString);
   let existingBuildNumbers = tags.map(t => parseInt(t.name.match(/-(\d+)$/)[1]));
   core.debug("Existing build numbers: ", JSON.stringify(existingBuildNumbers, undefined, 2));
   let currentBuildNumber = Math.max(...existingBuildNumbers);
