@@ -92,8 +92,9 @@ async function main() {
       const regexString = `/${prefix}(\\d+)$`;
       const regex = new RegExp(regexString);
       let tagsMatchingPrefix = allTags.filter(t => t.name.match(regex));
-      core.debug("Tags matching prefix: ", JSON.stringify(tagsMatchingPrefix, undefined, 2));
-      let existingBuildNumbers = tagsMatchingPrefix.map(t => parseInt(t.ref.match(/-(\d+)$/)[1]));
+      core.debug("Tags matching prefix: ");
+      core.debug(JSON.stringify(tagsMatchingPrefix, undefined, 2));
+      let existingBuildNumbers = tagsMatchingPrefix.map(t => parseInt(t.name.match(/-(\d+)$/)[1]));
       core.debug("Existing build numbers: ", JSON.stringify(existingBuildNumbers, undefined, 2));
       let currentBuildNumber = Math.max(...existingBuildNumbers);
       core.info(`Largest '${prefix}' tag is ${currentBuildNumber}.`);
