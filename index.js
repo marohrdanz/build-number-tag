@@ -61,11 +61,11 @@ function requestGitHubAPI(method, path, data, callback) {
     }
 }
 
-function run() {
+async function run() {
     const myToken = core.getInput('token');
     const octokit = github.getOctokit(myToken);
 
-    const { data: listTags } = octokit.rest.repos.listTags({
+    const { data: listTags } = await octokit.rest.repos.listTags({
         owner: 'marohrdanz',
         repo: 'testing-actions',
     });
@@ -79,9 +79,7 @@ function main() {
     //const prefix = `${env.INPUT_PREFIX}`; // default specified in action.yml
     const prefix = core.getInput('prefix');
     core.debug(`Tag prefix: ${prefix}`);
-    core.debug(`GITHUB_BASE_REF: ${GITHUB_BASE_REF}`);
-    core.debug(`GITHUB_REPOSITORY: ${GITHUB_REPOSITORY}`);
-    core.debug(`GITHUB_REPOSITORY_OWNER: ${GITHUB_REPOSITORY_OWNER}`);
+
 
     let nextBuildNumber;
     /* 
