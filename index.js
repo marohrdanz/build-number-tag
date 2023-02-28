@@ -1,6 +1,8 @@
 const https = require('https');
 const fs = require('fs')
 const zlib = require('zlib');
+const core = require('@actions/core');
+const github = require('@actions/github');
 env = process.env;
 
 /**
@@ -66,7 +68,11 @@ function requestGitHubAPI(method, path, data, callback) {
 }
 
 function main() {
-    const prefix = `${env.INPUT_PREFIX}`; // default specified in action.yml
+    //const prefix = `${env.INPUT_PREFIX}`; // default specified in action.yml
+    const prefix = core.getInput('prefix');
+    console.log("payload:")
+    const payload = JSON.stringify(github.context.payload, undefined, 2)
+    console.log(`The event payload: ${payload}`);
     let nextBuildNumber;
     /* 
       GET tags with specified prefix, based on the response:
