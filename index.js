@@ -65,12 +65,16 @@ async function run() {
     const myToken = core.getInput('token');
     const octokit = github.getOctokit(myToken);
 
-    const { data: listTags } = await octokit.rest.repos.listTags({
-        owner: 'marohrdanz',
-        repo: 'testing-actions',
+    const { data: pullRequest } = await octokit.rest.pulls.get({
+        owner: 'octokit',
+        repo: 'rest.js',
+        pull_number: 123,
+        mediaType: {
+          format: 'diff'
+        }
     });
-    core.info("Here are tags?");
-    console.log(listTags);
+
+    console.log(pullRequest);
 }
 
 run();
