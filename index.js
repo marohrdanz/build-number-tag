@@ -61,25 +61,19 @@ function requestGitHubAPI(method, path, data, callback) {
     }
 }
 
-async function getTags() {
+function run() {
     const myToken = core.getInput('token');
     const octokit = github.getOctokit(myToken);
-    const repo_name = github.context.payload.repository.name;
-    const repo_owner = github.context.payload.repository.owner.name;
 
-    const { data: listTags } = await octokit.rest.repos.listTags({
-        owner: repo_owner,
-        repo: repo_name
+    const { data: listTags } = octokit.rest.repos.listTags({
+        owner: 'marohrdanz',
+        repo: 'testing-actions',
     });
-    core.debug("Here are tags?");
-    core.debug(listTags);
+    core.info("Here are tags?");
     console.log(listTags);
-    return(listTags);
 }
 
-let allTags = getTags();
-core.debug("Tags: ")
-core.debug(allTags);
+run();
 
 function main() {
     //const prefix = `${env.INPUT_PREFIX}`; // default specified in action.yml
