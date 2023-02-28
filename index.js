@@ -34,7 +34,7 @@ async function main() {
 async function getAllTags() {
   const options =  {
     owner: repo_owner,
-    repo: repo_name
+    repo: github.context.payload.repository.name
   };
   core.debug("Options for getAllTags:");
   core.debug(JSON.stringify(options, null, 4));
