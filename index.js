@@ -8,7 +8,7 @@ const repo_name = github.context.payload.repository.name;
 const repo_owner = github.context.payload.repository.owner.name;
 const sha = github.context.payload.after;
 const prefix = core.getInput('prefix');
-core.debug(`Tag prefix: ${prefix}`);
+
 const payload = JSON.stringify(github.context.payload, undefined, 2)
 core.debug(`The event payload: ${payload}`);
 
@@ -54,8 +54,8 @@ function getTagsMatchingPrefix(tags) {
   const regexString = `${prefix}(\\d+)$`;
   const regex = new RegExp(regexString);
   let tagsMatchingPrefix = tags.filter(t => t.name.match(regex));
-  core.debug("Have matching tags")
-  //core.debug(JSON.stringify((tagsMatchingPrefix, undefined, 2)))
+  core.debug("Have matching tags:")
+  core.debug(JSON.stringify((tagsMatchingPrefix, undefined, 2)))
   return tagsMatchingPrefix;
 }
 
@@ -67,7 +67,6 @@ function getBuildNumber(tags) {
     build_number = 1;
     return build_number;
   }
-  core.debug("Trying to get existing tags")
   let existingBuildNumbers = tags.map(t => parseInt(t.name.match(/-(\d+)$/)[1]));
   core.debug("Existing build numbers: ", JSON.stringify(existingBuildNumbers, undefined, 2));
   let currentBuildNumber = Math.max(...existingBuildNumbers);
