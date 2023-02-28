@@ -4,16 +4,8 @@ const github = require('@actions/github');
 // Define some global variables for this short script
 const myToken = core.getInput('token');
 const octokit = github.getOctokit(myToken);
-const repo_name = github.context.payload.repository.name;
-const test_repo_name = `${process.env.GITHUB_REPOSITORY}`.split('/')[1];
 const prefix = core.getInput('prefix');
-core.debug(`repo_name: ${repo_name}`);
-core.debug(`test_repo_name: ${test_repo_name}`);
 core.debug(`Tag prefix: ${prefix}`);
-const payload = JSON.stringify(github.context.payload, undefined, 2)
-core.debug(`The event payload: ${payload}`);
-const whole_gitHub = JSON.stringify(github, undefined, 2);
-core.debug(`the whole github: ${whole_gitHub}`);
 
 main();
 
@@ -38,7 +30,7 @@ async function getAllTags() {
   try {
     const options =  {
       owner: `${process.env.GITHUB_REPOSITORY_OWNER}`,
-      repo: repo_name
+      repo: `${process.env.GITHUB_REPOSITORY}`.split('/')[1]
     };
     core.debug("Options for getAllTags:");
     core.debug(JSON.stringify(options, null, 4));
@@ -97,7 +89,7 @@ async function createTag(tagName) {
     core.debug(`Creating tag: ${tagName}`);
     const options = {
       owner: `${process.env.GITHUB_REPOSITORY_OWNER}`,
-      repo: repo_name,
+      repo: `${process.env.GITHUB_REPOSITORY}`.split('/')[1],
       ref: `refs/tags/${tagName}`,
       sha: `${process.env.GITHUB_SHA}` 
     }
