@@ -71,32 +71,34 @@ async function getTags() {
         owner: repo_owner,
         repo: repo_name
     });
+    core.debug("Here are tags?");
+    core.debug(listTags);
+    console.log(listTags);
     return(listTags);
 }
 
 async function main() {
     //const prefix = `${env.INPUT_PREFIX}`; // default specified in action.yml
+    const prefix = core.getInput('prefix');
+    core.debug(`Tag prefix: ${prefix}`);
     try {
-      const prefix = core.getInput('prefix');
-      core.debug(`Tag prefix: ${prefix}`);
       const payload = JSON.stringify(github.context.payload, undefined, 2)
       core.debug(`The event payload: ${payload}`);
-      let allTags = await getTags();
-      core.debug("Tags: ", JSON.stringify(allTags, undefined, 2));
-      const regexString = `/${prefix}(\\d+)$`;
-      const regex = new RegExp(regexString);
-      let tagsMatchingPrefix = allTags.filter(t => t.name.match(regex));
-      core.debug("Tags matching prefix: ", JSON.stringify(tagsMatchingPrefix, undefined, 2));
-      let existingBuildNumbers = tagsMatchingPrefix.map(t => parseInt(t.ref.match(/-(\d+)$/)[1]));
-      core.debug("Existing build numbers: ", JSON.stringify(existingBuildNumbers, undefined, 2));
-      let currentBuildNumber = Math.max(...existingBuildNumbers);
-      core.info(`Largest '${prefix}' tag is ${currentBuildNumber}.`);
-      let nextBuildNumber = currentBuildNumber + 1;
-      core.info(`Updating '${prefix}' counter to ${nextBuildNumber}.`);
     } catch(err) {
       core.error(err);
       core.setFailed(err);
     }
+    let allTags = await getTags();
+    core.debug("Tags: ")
+    core.debug(allTags);
+    const regexString = `/${prefix}(\\d+)$`;
+    const regex = new RegExp(regexString);
+    let tagsMatchingPrefix = allTags.filter(t => t.name.match(regex));
+    let existingBuildNumbers = tagsMatchingPrefix.map(t => parseInt(t.ref.match(/-(\d+)$/)[1]));
+    let currentBuildNumber = Math.max(...existingBuildNumbers);
+    core.info(`Largest '${prefix}' tag is ${currentBuildNumber}.`);
+    let nextBuildNumber = currentBuildNumber + 1;
+    core.info(`Updating '${prefix}' counter to ${nextBuildNumber}.`);
 
 
     //let nextBuildNumber;
