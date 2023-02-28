@@ -71,7 +71,6 @@ async function getTags() {
         owner: repo_owner,
         repo: repo_name
     });
-    core.debug("Tags in getTags ", JSON.stringify(listTags, undefined, 2));
     return(listTags);
 }
 
@@ -80,8 +79,8 @@ async function main() {
     try {
       const prefix = core.getInput('prefix');
       core.debug(`Tag prefix: ${prefix}`);
-      //const payload = JSON.stringify(github.context.payload, undefined, 2)
-      //core.debug(`The event payload: ${payload}`);
+      const payload = JSON.stringify(github.context.payload, undefined, 2)
+      core.debug(`The event payload: ${payload}`);
       let allTags = await getTags();
       core.debug("Tags: ", JSON.stringify(allTags, undefined, 2));
       const regexString = `/${prefix}(\\d+)$`;
