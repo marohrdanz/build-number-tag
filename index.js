@@ -7,6 +7,7 @@ const repo_name = github.context.payload.repository.name;
 const repo_owner = github.context.payload.repository.owner.name;
 const sha = github.context.payload.after;
 const payload = JSON.stringify(github.context.payload, undefined, 2)
+const prefix = core.getInput('prefix');
 console.log(`The event payload: ${payload}`);
 
 main();
@@ -24,14 +25,14 @@ async function getAllTags() {
   return(allTags);
 }
 
-function getTagsMatchingPrefix(tags, prefix) {
+function getTagsMatchingPrefix(tags ) {
   const regexString = `${prefix}(\\d+)$`;
   const regex = new RegExp(regexString);
   let tagsMatchingPrefix = tags.filter(t => t.name.match(regex));
   return (tagsMatchingPrefix);
 }
 
-function getBuildNumber(tags, prefix) {
+function getBuildNumber(tags) {
   let build_number;
   if (tags.length < 1) {
     core.info(`No tags matching ${prefix}. Setting build_number to 1.`);
@@ -63,8 +64,8 @@ async function createTag(tagName) {
 async function main() {
     try {
       let allTags = await getAllTags();
-      let tagsMatchingPrefix = getTagsMatchingPrefix(allTags, core.getInput('prefix'));
-      let build_number = getBuildNumber(tagsMatchingPrefix, core.getInput('prefix'));
+      let tagsMatchingPrefix = getTagsMatchingPrefix(allTags)
+      let build_number = getBuildNumber(tagsMatchingPrefix)
       core.info(`New build number for tag: ${build_number}.`);
       core.setOutput("build_number", build_number);
       let tagName = `${prefix}${build_number}`;
