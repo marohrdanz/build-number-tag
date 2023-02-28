@@ -79,8 +79,8 @@ function main() {
     //const prefix = `${env.INPUT_PREFIX}`; // default specified in action.yml
     const prefix = core.getInput('prefix');
     core.debug(`Tag prefix: ${prefix}`);
-    core.debug(`GITHUB_BASE_REF: ${GITHUB_BASE_REF}`);
-    core.debug(`GITHUB_REPOSITORY: ${GITHUB_REPOSITORY}`);
+    core.debug(`GITHUB_BASE_REF: process.env.GITHUB_BASE_REF`);
+    core.debug(`GITHUB_REPOSITORY: process.env.GITHUB_REPOSITORY`);
     core.debug(`GITHUB_REPOSITORY_OWNER: ${GITHUB_REPOSITORY_OWNER}`);
 
     let nextBuildNumber;
