@@ -79,16 +79,21 @@ function main() {
     //const prefix = `${env.INPUT_PREFIX}`; // default specified in action.yml
     const prefix = core.getInput('prefix');
     core.debug(`Tag prefix: ${prefix}`);
-    core.debug("GITHUB_BASE_REF:", process.env.GITHUB_BASE_REF);
-    core.debug("GITHUB_REPOSITORY:", process.env.GITHUB_REPOSITORY);
-    core.debug("Repo name: ", github.context.payload.repository.name);
-    core.debug("Repo owner: ", github.context.payload.repository.owner.name);
-    const payload = JSON.stringify(github.context.payload, undefined, 2)
-    console.log(`The event payload: ${payload}`);
-    core.debug(`Repo name: ", ${payload.repository.name}`);
-    const repo_name = github.context.payload.repository.owner.name;
-    core.debug(`Repo name: ${repo_name}`);
-    //core.debug(`GITHUB_REPOSITORY_OWNER: ${GITHUB_REPOSITORY_OWNER}`);
+    try {
+      core.debug("GITHUB_BASE_REF:", process.env.GITHUB_BASE_REF);
+      core.debug("GITHUB_REPOSITORY:", process.env.GITHUB_REPOSITORY);
+      core.debug("Repo name: ", github.context.payload.repository.name);
+      core.debug("Repo owner: ", github.context.payload.repository.owner.name);
+      const payload = JSON.stringify(github.context.payload, undefined, 2)
+      console.log(`The event payload: ${payload}`);
+      core.debug(`Repo name: ", ${payload.repository.name}`);
+      const repo_name = github.context.payload.repository.owner.name;
+      core.debug(`Repo name: ${repo_name}`);
+      //core.debug(`GITHUB_REPOSITORY_OWNER: ${GITHUB_REPOSITORY_OWNER}`);
+    } catch(err) {
+      core.error(err);
+      core.setFailed(err);
+    }
 
     let nextBuildNumber;
     /* 
