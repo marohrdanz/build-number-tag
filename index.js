@@ -71,7 +71,7 @@ async function getTags() {
         repo: repo_name
     };
     core.debug(JSON.stringify(options, null, 4));
-    const listTags = await octokit.rest.repos.listTags(options);
+    const { data: listTags } = await octokit.rest.repos.listTags(options);
     core.debug("Tags in getTags ", JSON.stringify(listTags, undefined, 2));
     return(listTags);
 }
