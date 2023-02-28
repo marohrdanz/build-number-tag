@@ -5,8 +5,8 @@ const myToken = core.getInput('token');
 const octokit = github.getOctokit(myToken);
 const repo_name = github.context.payload.repository.name;
 const repo_owner = github.context.payload.repository.owner.name;
-const payload = JSON.stringify(github.context.payload, undefined, 2)
-console.log(`The event payload: ${payload}`);
+//const prefix = core.getInput('prefix');
+//core.debug(`Tag prefix: ${prefix}`);
 
 main();
 
@@ -43,15 +43,6 @@ function getBuildNumber(tags, prefix) {
   core.info(`Largest '${prefix}' tag is ${currentBuildNumber}.`);
   build_number = currentBuildNumber + 1;
   return (build_number);
-}
-
-function createTag(tagName) {
-  const options = {
-    owner: repo_owner,
-    repo: repo_name,
-    ref: tagName,
-    sha: "zeta"
-  }
 }
 
 async function main() {
