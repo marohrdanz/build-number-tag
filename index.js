@@ -77,11 +77,7 @@ async function getTags() {
     return(listTags);
 }
 
-let allTags = getTags();
-core.debug("Tags: ")
-core.debug(allTags);
-
-function main() {
+async function main() {
     //const prefix = `${env.INPUT_PREFIX}`; // default specified in action.yml
     const prefix = core.getInput('prefix');
     core.debug(`Tag prefix: ${prefix}`);
@@ -102,7 +98,9 @@ function main() {
       core.error(err);
       core.setFailed(err);
     }
-
+    let allTags = await getTags();
+    core.debug("Tags: ")
+    core.debug(allTags);
     let nextBuildNumber;
     /* 
       GET tags with specified prefix, based on the response:
