@@ -1,8 +1,17 @@
 const https = require('https');
+const fs = require('fs')
 const zlib = require('zlib');
 const core = require('@actions/core');
 const github = require('@actions/github');
 env = process.env;
+
+/**
+ *  Print error message and exit
+ */
+function failWithError(message, exitCode=1) {
+    console.log(`::error::${message}`);
+    process.exit(exitCode);
+}
 
 /**
  * requestGitHubAPI Make https request to github repo
@@ -86,8 +95,10 @@ function main() {
             console.log(`Updating ${prefix} counter to ${nextBuildNumber}...`);
         } else {
             if (err) {
+                //failWithError(`Failed to get refs. Error: ${err}, status: ${status}`);
                 core.setFailed(`Failed to get refs. Error: ${err}, status: ${status}`);
             } else {
+                //failWithError(`Getting build-number refs failed with http status ${status}, error: ${JSON.stringify(result)}`);
                 core.setFailed(`Getting build-number refs failed with http status ${status}, error: ${JSON.stringify(result)}`);
             } 
        }
@@ -101,10 +112,16 @@ function main() {
         requestGitHubAPI('POST', `/repos/${env.GITHUB_REPOSITORY}/git/refs`, newTagData, (err, status, result) => {
             err = "fail on purpose";
             if (status !== 201 || err) {
+                failWithError(`Failed to create new ${prefix} tag. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
                 core.setFailed(`Failed to create new ${prefix} tag. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
             }
             console.log(`Successfully created new tag: ${prefix}${nextBuildNumber}`);
-            core.setOutput("build_number", nextBuildNumber);
+            /*
+              Output the new build number to GitHub output and environment variables in case the user's 
+              subsequent steps want to make use of it
+            */
+            fs.writeFileSync(process.env.GITHUB_OUTPUT, `build_number=${nextBuildNumber}`);
+            fs.writeFileSync(process.env.GITHUB_ENV, `BUILD_NUMBER=${nextBuildNumber}`);
          });
     });
 
