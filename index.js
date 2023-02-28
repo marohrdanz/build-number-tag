@@ -1,122 +1,115 @@
-const https = require('https');
-const fs = require('fs')
-const zlib = require('zlib');
-env = process.env;
+const core = require('@actions/core');
+const github = require('@actions/github');
 
-/**
- *  Print error message and exit
- */
-function failWithError(message, exitCode=1) {
-    console.log(`::error::${message}`);
-    process.exit(exitCode);
-}
-
-/**
- * requestGitHubAPI Make https request to github repo
- *
- * @param {string} method Request method. e.g. 'GET', 'POST'
- * @param {string} path Path in github. e.g. /repos/<my repo>/git/refs/tags/<tag-prefix>
- * @param {object} data Data to send if request is POST
- * @param {function} callback Callback function
- */
-function requestGitHubAPI(method, path, data, callback) {
-    try {
-        if (data) {
-            data = JSON.stringify(data);
-        }  
-        const options = {
-            hostname: 'api.github.com',
-            port: 443,
-            path,
-            method,
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': data ? data.length : 0,
-                'Accept-Encoding' : 'gzip',
-                'Authorization' : `token ${env.INPUT_TOKEN}`,
-                'User-Agent' : 'GitHub Action - development'
-            }
-        }
-        const req = https.request(options, res => {
-            let chunks = [];
-            res.on('data', d => chunks.push(d));
-            res.on('end', () => {
-                let buffer = Buffer.concat(chunks);
-                if (res.headers['content-encoding'] === 'gzip') {
-                    zlib.gunzip(buffer, (err, decoded) => {
-                        if (err) {
-                            callback(err);
-                        } else {
-                            callback(null, res.statusCode, decoded && JSON.parse(decoded));
-                        }
-                    });
-                } else {
-                    callback(null, res.statusCode, buffer.length > 0 ? JSON.parse(buffer) : null);
-                }
-            });
-            req.on('error', err => callback(err));
-        });
-        if (data) {
-            req.write(data);
-        }
-        req.end();
-    } catch(err) {
-        callback(err);
-    }
-}
-
-function main() {
-    const prefix = `${env.INPUT_PREFIX}`; // default specified in action.yml
-    let nextBuildNumber;
-    /* 
-      GET tags with specified prefix, based on the response:
-       - determine new tag hame (with updated build number)
-       - POST new tag
-       - output new build number (in case later steps want it)
-    */
-    requestGitHubAPI('GET', `/repos/${env.GITHUB_REPOSITORY}/git/refs/tags/${prefix}`, null, (err, status, result) => {
-       if (status === 404) {
-            console.log(`No ${prefix} ref available, starting at 1.`);
-            nextBuildNumber = 1;
-       } else if (status === 200) {
-            const regexString = `/${prefix}(\\d+)$`;
-            const regex = new RegExp(regexString);
-            let tagsMatchingPrefix = result.filter(d => d.ref.match(regex));
-            let existingBuildNumbers = tagsMatchingPrefix.map(t => parseInt(t.ref.match(/-(\d+)$/)[1]));
-            let currentBuildNumber = Math.max(...existingBuildNumbers);
-            console.log(`Largest ${prefix} number is ${currentBuildNumber}.`);
-            nextBuildNumber = currentBuildNumber + 1;
-            console.log(`Updating ${prefix} counter to ${nextBuildNumber}...`);
-        } else {
-            if (err) {
-                failWithError(`Failed to get refs. Error: ${err}, status: ${status}`);
-            } else {
-                failWithError(`Getting build-number refs failed with http status ${status}, error: ${JSON.stringify(result)}`);
-            } 
-       }
-       let newTagData = {
-            ref:`refs/tags/${prefix}${nextBuildNumber}`, 
-            sha: env.GITHUB_SHA
-        };
-        /*
-           POST new tag to repository
-        */
-        requestGitHubAPI('POST', `/repos/${env.GITHUB_REPOSITORY}/git/refs`, newTagData, (err, status, result) => {
-            if (status !== 201 || err) {
-                failWithError(`Failed to create new ${prefix} tag. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
-            }
-            console.log(`Successfully created new tag: ${prefix}${nextBuildNumber}`);
-            /*
-              Output the new build number to GitHub output and environment variables in case the user's 
-              subsequent steps want to make use of it
-            */
-            fs.writeFileSync(process.env.GITHUB_OUTPUT, `build_number=${nextBuildNumber}`);
-            fs.writeFileSync(process.env.GITHUB_ENV, `BUILD_NUMBER=${nextBuildNumber}`);
-         });
-    });
-
-}
+// Define some global variables for this short script
+const myToken = core.getInput('token');
+const octokit = github.getOctokit(myToken);
+const repo_name = github.context.payload.repository.name;
+const repo_owner = github.context.payload.repository.owner.name;
+const sha = github.context.payload.after;
+const prefix = core.getInput('prefix');
+core.debug(`Tag prefix: ${prefix}`);
+const payload = JSON.stringify(github.context.payload, undefined, 2)
+core.debug(`The event payload: ${payload}`);
 
 main();
+
+async function main() {
+  try {
+    let allTags = await getAllTags();
+    let tagsMatchingPrefix = getTagsMatchingPrefix(allTags)
+    let build_number = getBuildNumber(tagsMatchingPrefix)
+    let tagName = `${prefix}${build_number}`;
+    response = await createTag(tagName)
+    core.notice(`Created new tag: ${tagName}`);
+    core.notice(`Set action outpupt: build_number = ${build_number}`);
+    core.setOutput("build_number", build_number);
+  } catch(err) {
+    core.error(err);
+    core.setFailed(err);
+  }
+}
+
+// Returns list of all tags in repo
+async function getAllTags() {
+  try {
+    const options =  {
+      owner: repo_owner,
+      repo: repo_name
+    };
+    core.debug("Options for getAllTags:");
+    core.debug(JSON.stringify(options, null, 4));
+    const response = await octokit.rest.repos.listTags(options);
+    core.debug("Have response from getting tags")
+    let allTags = response.data;
+    return allTags;
+  } catch (err) {
+    core.error("Error getting tags");
+    throw err;
+  }
+}
+
+// Returns list of all input tags that match ${prefix} global variable
+function getTagsMatchingPrefix(tags) {
+  try {
+    const regexString = `${prefix}(\\d+)$`;
+    const regex = new RegExp(regexString);
+    let tagsMatchingPrefix = tags.filter(t => t.name.match(regex));
+    core.debug("Have matching tags")
+    return tagsMatchingPrefix;
+  } catch (err) {
+    core.error("Error getting tags matching prefix");
+    throw err;
+  }
+}
+
+// Determines new build number based on tags and ${prefix} global variable
+function getBuildNumber(tags) {
+  try {
+    let build_number;
+    if (tags.length < 1) {
+      core.info(`No tags matching prefix '${prefix}'. Setting build number to 1.`);
+      build_number = 1;
+      return build_number;
+    }
+    core.debug("Trying to get existing tags")
+    let tagsString = JSON.stringify(tags, undefined, 2);
+    core.debug(tagsString);
+    let existingBuildNumbers = tags.map(t => parseInt(t.name.match(/(\d+)$/)[1]));
+    core.debug("Existing build numbers: ", JSON.stringify(existingBuildNumbers, undefined, 2));
+    let currentBuildNumber = Math.max(...existingBuildNumbers);
+    core.debug(`Largest '${prefix}' tag is ${currentBuildNumber}.`);
+    build_number = currentBuildNumber + 1;
+    core.info(`Build number: ${build_number}.`);
+    return build_number;
+  } catch (err) {
+    core.error("Error getting build number");
+    throw err;
+  }
+}
+
+// Creates new tag in the repo
+async function createTag(tagName) {
+  try {
+    core.debug(`Creating tag: ${tagName}`);
+    const options = {
+      owner: repo_owner,
+      repo: repo_name,
+      ref: `refs/tags/${tagName}`,
+      sha: sha
+    }
+    core.debug("Options for createTag:");
+    core.debug(JSON.stringify(options, null, 4));
+    const response = await octokit.rest.git.createRef(options);
+    core.debug(response);
+    return response;
+  } catch (err) {
+    core.error("Error creating new tag")
+    throw err
+  }
+}
+
+
+
 
 
