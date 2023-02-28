@@ -8,6 +8,9 @@ const repo_name = github.context.payload.repository.name;
 const repo_owner = github.context.payload.repository.owner.name;
 const sha = github.context.payload.after;
 const prefix = core.getInput('prefix');
+core.debug(`repo_name: ${repo_name}`);
+core.debug(`repo_owner: ${repo_owner}`);
+core.debug(`sha: ${sha}`);
 core.debug(`Tag prefix: ${prefix}`);
 const payload = JSON.stringify(github.context.payload, undefined, 2)
 core.debug(`The event payload: ${payload}`);
