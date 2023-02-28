@@ -87,8 +87,7 @@ async function main() {
       //const payload = JSON.stringify(github.context.payload, undefined, 2)
       //core.debug(`The event payload: ${payload}`);
       let allTags = await getTags();
-      core.debug("Tags in main: ");
-      core.debug(JSON.stringify(allTags, undefined, 2));
+      core.debug("Tags: ", JSON.stringify(allTags, undefined, 2));
       const regexString = `/${prefix}(\\d+)$`;
       const regex = new RegExp(regexString);
       let tagsMatchingPrefix = allTags.filter(t => t.name.match(regex));
