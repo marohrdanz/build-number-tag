@@ -72,7 +72,7 @@ async function getTags() {
     };
     core.debug(JSON.stringify(options, null, 4));
     const response = await octokit.rest.repos.listTags(options);
-    console.log(response);
+    console.log(listTags);
     allTags = response.data;
     core.debug("Tags in getTags ")
     core.debug(JSON.stringify(allTags, undefined, 2));
