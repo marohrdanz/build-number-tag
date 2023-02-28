@@ -89,10 +89,10 @@ async function main() {
       let allTags = await getTags();
       core.debug("Tags in main: ");
       core.debug(JSON.stringify(allTags, undefined, 2));
-      const regexString = `${prefix}(\\d+)$`;
+      const regexString = `/${prefix}(\\d+)$`;
       const regex = new RegExp(regexString);
       let tagsMatchingPrefix = allTags.filter(t => {
-        core.debug(t.name);
+        core.debug(t);
         t.name.match(regex)
       });
       core.debug("Tags matching prefix: ");
