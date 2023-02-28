@@ -81,8 +81,6 @@ function main() {
     core.debug(`Tag prefix: ${prefix}`);
     core.debug("GITHUB_BASE_REF:", process.env.GITHUB_BASE_REF);
     core.debug("GITHUB_REPOSITORY:", process.env.GITHUB_REPOSITORY);
-    core.debug("Repo name: ", github.context.payload.repository.name);
-    core.debug("Repo owner: ", github.context.payload.repository.owner.name);
     const payload = JSON.stringify(github.context.payload, undefined, 2)
     console.log(`The event payload: ${payload}`);
     //core.debug(`GITHUB_REPOSITORY_OWNER: ${GITHUB_REPOSITORY_OWNER}`);
