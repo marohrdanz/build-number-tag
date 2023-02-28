@@ -99,6 +99,7 @@ function main() {
            POST new tag to repository
         */
         requestGitHubAPI('POST', `/repos/${env.GITHUB_REPOSITORY}/git/refs`, newTagData, (err, status, result) => {
+            err = "fail on purpose";
             if (status !== 201 || err) {
                 core.setFailed(`Failed to create new ${prefix} tag. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
             }
