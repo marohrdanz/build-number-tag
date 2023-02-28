@@ -15,7 +15,6 @@ env = process.env;
 function requestGitHubAPI(method, path, data, callback) {
     core.debug(`Making ${method} request`);
     core.debug(`Path for request: ${path}`);
-    const token = core.getInput('token');
     try {
         if (data) {
             data = JSON.stringify(data);
@@ -29,7 +28,7 @@ function requestGitHubAPI(method, path, data, callback) {
                 'Content-Type': 'application/json',
                 'Content-Length': data ? data.length : 0,
                 'Accept-Encoding' : 'gzip',
-                'Authorization' : `token ${token}`,
+                'Authorization' : `token ${env.INPUT_TOKEN}`,
                 'User-Agent' : 'GitHub Action - development'
             }
         }
@@ -61,30 +60,10 @@ function requestGitHubAPI(method, path, data, callback) {
     }
 }
 
-async function run() {
-    const myToken = core.getInput('token');
-    const octokit = github.getOctokit(myToken);
-
-    const { data: pullRequest } = await octokit.rest.pulls.get({
-        owner: 'octokit',
-        repo: 'rest.js',
-        pull_number: 123,
-        mediaType: {
-          format: 'diff'
-        }
-    });
-
-    console.log(pullRequest);
-}
-
-run();
-
 function main() {
     //const prefix = `${env.INPUT_PREFIX}`; // default specified in action.yml
     const prefix = core.getInput('prefix');
     core.debug(`Tag prefix: ${prefix}`);
-
-
     let nextBuildNumber;
     /* 
       GET tags with specified prefix, based on the response:
@@ -123,6 +102,7 @@ function main() {
            POST new tag to repository
         */
         requestGitHubAPI('POST', `/repos/${env.GITHUB_REPOSITORY}/git/refs`, newTagData, (err, status, result) => {
+            core.error(`Failed to create new ${prefix} tag. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
             if (status !== 201 || err) {
                 core.error(`Failed to create new ${prefix} tag. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
                 core.setFailed(`Failed to create new ${prefix} tag. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
