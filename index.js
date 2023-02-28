@@ -44,19 +44,23 @@ async function getAllTags() {
     let allTags = response.data;
     return allTags;
   } catch (err) {
-    core.error(err);
-    throw "Error getting tags";
+    core.error("Error getting tags");
+    throw err;
   }
 }
 
 // Returns list of all input tags that match ${prefix} global variable
 function getTagsMatchingPrefix(tags) {
-  const regexString = `${prefix}(\\d+)$`;
-  const regex = new RegExp(regexString);
-  let tagsMatchingPrefix = tags.filter(t => t.name.match(regex));
-  core.debug("Have matching tags")
-  //core.debug(JSON.stringify((tagsMatchingPrefix, undefined, 2)))
-  return tagsMatchingPrefix;
+  try {
+    const regexString = `${prefix}(\\d+)$`;
+    const regex = new RegExp(regexString);
+    let tagsMatchingPrefix = tags.filter(t => t.name.match(regex));
+    core.debug("Have matching tags")
+    return tagsMatchingPrefix;
+  } catch (err) {
+    core.error("Error getting tags matching prefix");
+    throw err;
+  }
 }
 
 // Determines new build number based on tags and ${prefix} global variable
@@ -71,7 +75,7 @@ function getBuildNumber(tags) {
     core.debug("Trying to get existing tags")
     let tagsString = JSON.stringify(tags, undefined, 2);
     core.debug(tagsString);
-    let existingBuildNumbers = tags.map(t => parseInt(t.name.match(/-(\d+)$/)[1]));
+    let existingBuildNumbers = tags.map(t => parseInt(t.name.match(/(\d+)$/)[1]));
     core.debug("Existing build numbers: ", JSON.stringify(existingBuildNumbers, undefined, 2));
     let currentBuildNumber = Math.max(...existingBuildNumbers);
     core.debug(`Largest '${prefix}' tag is ${currentBuildNumber}.`);
@@ -79,25 +83,30 @@ function getBuildNumber(tags) {
     core.info(`Build number: ${build_number}.`);
     return build_number;
   } catch (err) {
-    core.error(err)
-    throw "Error getting build number";
+    core.error("Error getting build number");
+    throw err;
   }
 }
 
 // Creates new tag in the repo
 async function createTag(tagName) {
-  core.debug(`Creating tag: ${tagName}`);
-  const options = {
-    owner: repo_owner,
-    repo: repo_name,
-    ref: `refs/tags/${tagName}`,
-    sha: sha
+  try {
+    core.debug(`Creating tag: ${tagName}`);
+    const options = {
+      owner: repo_owner,
+      repo: repo_name,
+      ref: `refs/tags/${tagName}`,
+      sha: sha
+    }
+    core.debug("Options for createTag:");
+    core.debug(JSON.stringify(options, null, 4));
+    const response = await octokit.rest.git.createRef(options);
+    core.debug(response);
+    return response;
+  } catch (err) {
+    core.error("Error creating new tag")
+    throw err
   }
-  core.debug("Options for createTag:");
-  core.debug(JSON.stringify(options, null, 4));
-  const response = await octokit.rest.git.createRef(options);
-  core.debug(response);
-  return response;
 }
 
 
