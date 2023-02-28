@@ -4,7 +4,8 @@ const github = require('@actions/github');
 // Define some global variables for this short script
 const myToken = core.getInput('token');
 const octokit = github.getOctokit(myToken);
-const repo_name = github.context.payload.repository.name;
+const repo_name = `${env.GITHUB_REPOSITORY}`;
+//const repo_name = github.context.payload.repository.name;
 const repo_owner = github.context.payload.repository.owner.name;
 const sha = github.context.payload.after;
 const prefix = core.getInput('prefix');
