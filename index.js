@@ -32,15 +32,21 @@ async function main() {
 
 // Returns list of all tags in repo
 async function getAllTags() {
-  const options =  {
-    owner: repo_owner,
-    repo: repo_name
-  };
-  core.debug("Options for getAllTags:");
-  core.debug(JSON.stringify(options, null, 4));
-  const response = await octokit.rest.repos.listTags(options);
-  allTags = response.data;
-  return allTags;
+  try {
+    const options =  {
+      owner: repo_owner,
+      repo: repo_name
+    };
+    core.debug("Options for getAllTags:");
+    core.debug(JSON.stringify(options, null, 4));
+    const response = await octokit.rest.repos.listTags(options);
+    core.debug("Have response from getting tags")
+    console.log(response);
+    allTags = response.data;
+    return allTags;
+  } catch (err) {
+    return err;
+  }
 }
 
 // Returns list of all input tags that match ${prefix} global variable
