@@ -17,7 +17,7 @@ async function main() {
     let allTags = await getAllTags();
     let tagsMatchingPrefix = getTagsMatchingPrefix(allTags)
     let build_number = getBuildNumber(tagsMatchingPrefix)
-    let tagName = `/refs/tags/${prefix}${build_number}`;
+    let tagName = `refs/tags/${prefix}${build_number}`;
     response = await createTag(tagName)
     core.debug("after creating tag")
     core.info(`New build number for tag: ${build_number}.`);
