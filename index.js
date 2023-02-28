@@ -3,7 +3,10 @@ const fs = require('fs')
 const zlib = require('zlib');
 env = process.env;
 
-function fail(message, exitCode=1) {
+/**
+ *  Print error message and exit
+ */
+function failWithError(message, exitCode=1) {
     console.log(`::error::${message}`);
     process.exit(exitCode);
 }
@@ -64,6 +67,7 @@ function requestGitHubAPI(method, path, data, callback) {
 
 function main() {
     const prefix = `${env.INPUT_PREFIX}`; // default specified in action.yml
+    let nextBuildNumber;
     /* 
       GET tags with specified prefix, based on the response:
        - determine new tag hame (with updated build number)
@@ -74,11 +78,10 @@ function main() {
        if (status === 404) {
             console.log(`No ${prefix} ref available, starting at 1.`);
             nextBuildNumber = 1;
-            tagsMatchingPrefix = [];
        } else if (status === 200) {
             const regexString = `/${prefix}(\\d+)$`;
             const regex = new RegExp(regexString);
-            tagsMatchingPrefix = result.filter(d => d.ref.match(regex));
+            let tagsMatchingPrefix = result.filter(d => d.ref.match(regex));
             let existingBuildNumbers = tagsMatchingPrefix.map(t => parseInt(t.ref.match(/-(\d+)$/)[1]));
             let currentBuildNumber = Math.max(...existingBuildNumbers);
             console.log(`Largest ${prefix} number is ${currentBuildNumber}.`);
@@ -86,9 +89,9 @@ function main() {
             console.log(`Updating ${prefix} counter to ${nextBuildNumber}...`);
         } else {
             if (err) {
-                fail(`Failed to get refs. Error: ${err}, status: ${status}`);
+                failWithError(`Failed to get refs. Error: ${err}, status: ${status}`);
             } else {
-                fail(`Getting build-number refs failed with http status ${status}, error: ${JSON.stringify(result)}`);
+                failWithError(`Getting build-number refs failed with http status ${status}, error: ${JSON.stringify(result)}`);
             } 
        }
        let newTagData = {
@@ -100,7 +103,7 @@ function main() {
         */
         requestGitHubAPI('POST', `/repos/${env.GITHUB_REPOSITORY}/git/refs`, newTagData, (err, status, result) => {
             if (status !== 201 || err) {
-                fail(`Failed to create new ${prefix} tag. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
+                failWithError(`Failed to create new ${prefix} tag. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
             }
             console.log(`Successfully created new tag: ${prefix}${nextBuildNumber}`);
             /*
