@@ -5,7 +5,7 @@ const github = require('@actions/github');
 const myToken = core.getInput('token');
 const octokit = github.getOctokit(myToken);
 const repo_name = github.context.payload.repository.name;
-const test_repo_name = `${process.env.GITHUB_REPOSITORY}`.split('/')[2];
+const test_repo_name = `${process.env.GITHUB_REPOSITORY}`.split('/')[1];
 const prefix = core.getInput('prefix');
 core.debug(`repo_name: ${repo_name}`);
 core.debug(`test_repo_name: ${test_repo_name}`);
