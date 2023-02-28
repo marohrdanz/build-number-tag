@@ -66,12 +66,11 @@ async function getTags() {
     const octokit = github.getOctokit(myToken);
     const repo_name = github.context.payload.repository.name;
     const repo_owner = github.context.payload.repository.owner.name;
-    const options =  {
+
+    const { data: listTags } = await octokit.rest.repos.listTags({
         owner: repo_owner,
         repo: repo_name
-    };
-    core.debug(JSON.stringify(options, null, 4));
-    const { data: listTags } = await octokit.rest.repos.listTags(options);
+    });
     core.debug("Tags in getTags ", JSON.stringify(listTags, undefined, 2));
     return(listTags);
 }
