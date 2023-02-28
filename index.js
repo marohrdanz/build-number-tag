@@ -1,5 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
+const fs = require('fs');
 
 // Define some global variables for this short script
 const myToken = core.getInput('token');
@@ -7,7 +8,18 @@ const octokit = github.getOctokit(myToken);
 const prefix = core.getInput('prefix');
 core.debug(`Tag prefix: ${prefix}`);
 
-main();
+//main();
+const workspace = `${process.env.GITHUB_WORKSPACE}`
+core.debug(`The workspace: ${workspace}`);
+fs.readdir(`${process.env.GITHUB_WORKSPACE}`, (err, files) => {
+  if (err) {
+    core.error(err);
+  }
+  files.forEach(file => {
+    core.debug(file);
+  });
+})
+
 
 async function main() {
   try {
