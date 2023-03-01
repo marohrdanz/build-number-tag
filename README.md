@@ -25,34 +25,36 @@ this action  will create a new tag: 'build-4'.
 
 - `build_number`: New build number. Output in case subsequent workflow steps want to use it.
 
-## Example usage
+## Example Usage
 
-The following will create a tag 'build-\<build\_number\>':
+Here are three different examples of how to use this action.
 
-```yaml
-uses: marohrdanz/build-number-tag@v1.0.0
-with:
-  token: ${{ secrets.TOKEN }}
-```
+1. To create a tag 'build-\<build\_number\>':
 
-The following will create a tag 'my-build-number-\<build\_number\>':
+   ```yaml
+   uses: marohrdanz/build-number-tag@v1.0.0
+   with:
+     token: ${{ secrets.TOKEN }}
+   ```
 
-```yaml
-uses: marohrdanz/build-number-tag@v1.0.0
-with:
-  prefix: 'my-build-number-'
-  token: ${{ secrets.TOKEN }}
-```
+2. To create a tag 'my-build-number-\<build\_number\>':
 
-The following will create a tag '3.4.2-my-build-number-\<build\_number\>':
+   ```yaml
+   uses: marohrdanz/build-number-tag@v1.0.0
+   with:
+     prefix: 'my-build-number-'
+     token: ${{ secrets.TOKEN }}
+   ```
 
-```yaml
-uses: marohrdanz/build-number-tag@v1.0.0
-with:
-  prefix: '-my-build-number-'
-  token: ${{ secrets.TOKEN }}
-  version_prefix: "3.4.2"
-```
+3. To create a tag '3.4.2-my-build-number-\<build\_number\>':
+
+   ```yaml
+   uses: marohrdanz/build-number-tag@v1.0.0
+   with:
+     prefix: '-my-build-number-'
+     token: ${{ secrets.TOKEN }}
+     version_prefix: "3.4.2"
+   ```
 
 Heavily inspired by https://github.com/onyxmueller
 
