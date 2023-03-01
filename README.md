@@ -1,6 +1,6 @@
-# Create Build Number Tag
+# GitHub Action to Create Build Number Tag
 
-This action creates a tag in the repo with the build number, and optional version number.
+This action creates a tag in the repo with an incremental build number, and optional version number.
 
 To determine the build number, this action examines the existing tags in the repo matching the 
 prefix (default prefix 'build-'), finds the largest existing number, and increments it by 1.
@@ -11,7 +11,7 @@ For example, if the repo has existing tags:
 - build-2
 - build-3
 
-this action  will create a new tag: 'build-4'.
+this action  will create a new tag: *build-4*.
 
 ## Inputs
 
@@ -27,7 +27,7 @@ this action  will create a new tag: 'build-4'.
 
 ## Example Usage
 
-Here are three different examples of how to use this action.
+Below are three different examples of how to use this action.
 
 1. To create a tag 'build-\<build\_number\>':
 
