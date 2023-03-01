@@ -4,10 +4,10 @@ This action creates a tag with the build number in the repo, with optional versi
 
 ## Inputs
 
-- `prefix`: Prefix for tag. Default: 'build-number-'
+- `prefix`: Prefix for tag. Default: 'build-'
 - `token`: GitHub token to create tag
 - `version_prefix`: Optional prefix to prefix :laughing:
-  - This is for uses who want tags such as '\<version\_number\>-build-number-\<build\_number\>',    
+  - This is for uses who want tags such as '\<version\_number\>-build-\<build\_number\>',    
     e.g. '2.3.1-build-number-4'
 
 ## Outputs

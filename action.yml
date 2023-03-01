@@ -4,7 +4,7 @@ inputs:
   prefix:
     description: 'Prefix for tag'
     required: false
-    default: 'build-number-'
+    default: 'build-'
   token:
     description: 'GitHub token to create and delete refs'
     required: true
