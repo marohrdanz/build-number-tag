@@ -6,6 +6,8 @@ const myToken = core.getInput('token');
 const octokit = github.getOctokit(myToken);
 const prefix = core.getInput('prefix');
 core.debug(`Tag prefix: ${prefix}`);
+const version_prefix = core.getInput('version_prefix');
+core.debug(`Version prefix for the tag: ${version_prefix}`);
 
 main();
 
@@ -14,10 +16,15 @@ async function main() {
     let allTags = await getAllTags();
     let tagsMatchingPrefix = getTagsMatchingPrefix(allTags)
     let build_number = getBuildNumber(tagsMatchingPrefix)
-    let tagName = `${prefix}${build_number}`;
+    let tagName;
+    if (version_prefix != '') {
+      tagName = `${version_prefix}${prefix}${build_number}`;
+    } else {
+      tagName = `${prefix}${build_number}`;
+    }
     response = await createTag(tagName)
     core.notice(`Created new tag: ${tagName}`);
-    core.notice(`Set action outpupt: build_number = ${build_number}`);
+    core.info(`Set action outpupt: build_number = ${build_number}`);
     core.setOutput("build_number", build_number);
   } catch(err) {
     core.error(err);
