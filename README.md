@@ -16,27 +16,27 @@ This action creates a tag with the build number in the repo, with optional versi
 
 ## Example usage
 
-The following will create a tag 'build-\<build\_number\>'
+The following will create a tag 'build-\<build\_number\>':
 
 ```yaml
-uses: marohrdanz/build-number-tag@main
+uses: marohrdanz/build-number-tag@v1.0.0
 with:
   token: ${{ secrets.TOKEN }}
 ```
 
-The following will create a tag 'my-build-number-\<build\_number\>'
+The following will create a tag 'my-build-number-\<build\_number\>':
 
 ```yaml
-uses: marohrdanz/build-number-tag@main
+uses: marohrdanz/build-number-tag@v1.0.0
 with:
   prefix: 'my-build-number-'
   token: ${{ secrets.TOKEN }}
 ```
 
-The following will create a tag '3.4.2-my-build-number-\<build\_number\>'
+The following will create a tag '3.4.2-my-build-number-\<build\_number\>':
 
 ```yaml
-uses: marohrdanz/build-number-tag@main
+uses: marohrdanz/build-number-tag@v1.0.0
 with:
   prefix: '-my-build-number-'
   token: ${{ secrets.TOKEN }}
