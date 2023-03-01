@@ -24,7 +24,7 @@ async function main() {
     }
     response = await createTag(tagName)
     core.notice(`Created new tag: ${tagName}`);
-    core.notice(`Set action outpupt: build_number = ${build_number}`);
+    core.info(`Set action outpupt: build_number = ${build_number}`);
     core.setOutput("build_number", build_number);
   } catch(err) {
     core.error(err);
