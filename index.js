@@ -6,6 +6,8 @@ const myToken = core.getInput('token');
 const octokit = github.getOctokit(myToken);
 const prefix = core.getInput('prefix');
 core.debug(`Tag prefix: ${prefix}`);
+const version_prefix = core.getInput('version_prefix');
+core.debug(`Version prefix for the tag: ${version_prefix}`);
 
 main();
 

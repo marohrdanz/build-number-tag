@@ -8,6 +8,9 @@ inputs:
   token:
     description: 'GitHub token to create and delete refs'
     required: true
+  version_prefix:
+    description: 'Optional version number to prefix the prefix'
+    required: false
 outputs:
   build_number:
     description: 'Build tag number'
