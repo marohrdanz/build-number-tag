@@ -7,9 +7,9 @@ prefix (default prefix 'build-'), finds the largest existing number, and increme
 
 For example, if the repo has existing tags: 
 
-- build-1
-- build-2
-- build-3
+- *build-1*
+- *build-2*
+- *build-3*
 
 this action  will create a new tag: *build-4*.
 
