@@ -8,13 +8,21 @@ This action creates a tag with the build number in the repo, with optional versi
 - `token`: GitHub token to create tag
 - `version_prefix`: Optional prefix to prefix :laughing:
   - This is for uses who want tags such as '\<version\_number\>-build-\<build\_number\>',    
-    e.g. '2.3.1-build-number-4'
+    e.g. '2.3.1-build-4'
 
 ## Outputs
 
 - `build_number`: New build number. Output in case subsequent steps want to use it
 
 ## Example usage
+
+The following will create a tag 'build-\<build\_number\>'
+
+```yaml
+uses: marohrdanz/build-number-tag@main
+with:
+  token: ${{ secrets.TOKEN }}
+```
 
 The following will create a tag 'my-build-number-\<build\_number\>'
 
@@ -25,12 +33,12 @@ with:
   token: ${{ secrets.TOKEN }}
 ```
 
-The following will create a tag '3.4.2-build-number-\<build\_number\>'
+The following will create a tag '3.4.2-my-build-number-\<build\_number\>'
 
 ```yaml
 uses: marohrdanz/build-number-tag@main
 with:
-  prefix: '-build-number-'
+  prefix: '-my-build-number-'
   token: ${{ secrets.TOKEN }}
   version_prefix: "3.4.2"
 ```
