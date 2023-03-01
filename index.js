@@ -16,7 +16,12 @@ async function main() {
     let allTags = await getAllTags();
     let tagsMatchingPrefix = getTagsMatchingPrefix(allTags)
     let build_number = getBuildNumber(tagsMatchingPrefix)
-    let tagName = `${prefix}${build_number}`;
+    let tagName;
+    if (version_prefix != '') {
+      tagName = `${prefix}${build_number}`;
+    } else {
+      tagName = `${version_prefix}${prefix}${build_number}`;
+    }
     response = await createTag(tagName)
     core.notice(`Created new tag: ${tagName}`);
     core.notice(`Set action outpupt: build_number = ${build_number}`);
