@@ -1,11 +1,12 @@
 # Create Build Number Tag
 
-This action creates a tag with the build number in the repo.
+This action creates a tag with the build number in the repo, with optional version number.
 
 ## Inputs
 
 - `prefix`: Prefix for tag. Default: 'build-number-'
 - `token`: GitHub token to create tag
+- `version_prefix`: Optional prefix to prefix :laughing:
 
 ## Outputs
 
@@ -13,11 +14,23 @@ This action creates a tag with the build number in the repo.
 
 ## Example usage
 
+The following will create a tag 'my-build-number-\<build\_number\>'
+
 ```yaml
 uses: marohrdanz/build-number-tag@main
 with:
-  token: ${{ secrets.TOKEN }}
   prefix: 'my-build-number-'
+  token: ${{ secrets.TOKEN }}
+```
+
+The following will create a tag '3.4.2-build-number-\<build\_number\>'
+
+```yaml
+uses: marohrdanz/build-number-tag@main
+with:
+  prefix: '-build-number-'
+  token: ${{ secrets.TOKEN }}
+  version_prefix: "3.4.2"
 ```
 
 Heavily inspired by https://github.com/onyxmueller
