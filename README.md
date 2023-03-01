@@ -1,12 +1,17 @@
 # Create Build Number Tag
 
-This action creates a tag in the repo with the build number in the repo, with optional version number.
+This action creates a tag in the repo with the build number, and optional version number.
 
 To determine the build number, this action examines the existing tags in the repo matching the 
 prefix (default prefix 'build-'), finds the largest existing number, and increments it by 1.
 
-For example, if the repo has existing tags: 'build-1', 'build-2', 'build-3', this action 
-will create a new tag 'build-4'.
+For example, if the repo has existing tags: 
+
+- build-1
+- build-2
+- build-3
+
+this action  will create a new tag: 'build-4'.
 
 ## Inputs
 
