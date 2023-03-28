@@ -26,6 +26,8 @@ async function main() {
     core.notice(`Created new tag: ${tagName}`);
     core.info(`Set action outpupt: build_number = ${build_number}`);
     core.setOutput("build_number", build_number);
+    core.info(`Set action outpupt: tag_name = ${tagName}`);
+    core.setOutput("tag_name", tagName);
   } catch(err) {
     core.error(err);
     core.setFailed(err);

@@ -14,6 +14,8 @@ inputs:
 outputs:
   build_number:
     description: 'Build tag number'
+  tag_name:
+    description: 'Name of tag created'
 runs:
   using: 'node16'
   main: 'index.js'
