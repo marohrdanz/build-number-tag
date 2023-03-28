@@ -24,6 +24,7 @@ this action  will create a new tag: *build-4*.
 ## Outputs
 
 - `build_number`: New build number. Output in case subsequent workflow steps want to use it.
+- `tag_name`: Name of tag crteated. Output in case subsequent workflow steps want to use it.
 
 ## Example Usage
 
