@@ -17,5 +17,5 @@ outputs:
   tag_name:
     description: 'Name of tag created'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'index.js'
